@@ -1,9 +1,15 @@
 import br.com.fatec.lista2.model.*;
 
 import java.util.Calendar;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class Testes {
+        public static void printa(Calendar n) {
+                System.out.println(n.getTime().toString());
+        }
         public static void main(String[] args) {
                 Client c = new Client();
                 c.setName("Tobias");
@@ -38,8 +44,8 @@ public class Testes {
                 Client c3 = new Client();
                 c3.setName("Tabata");
                 Vehicle v2 = new Vehicle();
-                v2.setBrand("Volkswagen");
-                v2.setModelVersion("Gol");
+                v2.setBrand("Chevrolet");
+                v2.setModelVersion("Celta");
                 c3.setVehicle(v2);
                 Client c4 = new Client();
                 c4.setName("Amanda");
@@ -50,6 +56,18 @@ public class Testes {
                 agenda.add(c3);
                 agenda.add(c4);
 
-                c.print();
+                agenda.remove(c);
+
+                Review r = new Review();
+                Calendar s = Calendar.getInstance();
+                s.set(Calendar.DAY_OF_MONTH,19);
+                s.set(Calendar.MONTH, 04);
+                s.set(Calendar.YEAR, 2020);
+
+                r.setReviewDate(s);
+                r.setClient(c);
+
+                Revisions rev = new Revisions();
+                rev.add(r);
         }
 }

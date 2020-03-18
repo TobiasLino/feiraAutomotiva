@@ -27,8 +27,8 @@ public class Phone {
         }
         // Impressão dos dados
         public void print() {
-                System.out.println("Telefone.\n"
-                        + "\tNúmero: " + number);
+                System.out.println("\tTelefone.\n"
+                        + "\t\tNúmero: " + number);
         }
         /*
          * Getters e Setters

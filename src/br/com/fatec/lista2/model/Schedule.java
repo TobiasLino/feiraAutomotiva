@@ -39,6 +39,7 @@ public class Schedule {
         }
         /*
          * Adiciona um novo cliente, junto com seu carro
+         * Compreendendo o requisito funcional 01
          */
         public void add(Client client) {
                 if (clientSchedule.containsKey(client.getName().charAt(0))) {
@@ -46,15 +47,17 @@ public class Schedule {
                         // ordena
                         clientSchedule.get(client.getName().charAt(0)).sort(Comparator.comparing(Client::getName));
                         // adiciona o veículo do cliente na lista de veículos
-                        add(client.getVehicle());
                 } else {
                         clientSchedule.put(client.getName().charAt(0), new LinkedList<>());
                         clientSchedule.get(client.getName().charAt(0)).add(client);
                         // não precisa ordenar pois só tem um único cliente.
-                        add(client.getVehicle());
                 }
+                add(client.getVehicle());
         }
-        // Adiciona um veículo no map
+        /*
+         * Adiciona um veículo no map
+         * Compreendendo o requisito funcional 04
+         */
         public void add(Vehicle vehicle) {
                 if (!vehicle.getBrand().equals("")) {
                         if (vehicleSchedule.containsKey(vehicle.getBrand())) {
@@ -67,7 +70,52 @@ public class Schedule {
                         }
                 }
         }
-
+        /*
+         * Remoção do cliente da lista
+         * Compreendendo o requisito funcional 02
+         */
+        public void remove(Client client) {
+                // Como cada cliente terá um veículo, a remoção do cliente também removerá
+                // o seu veículo.
+                remove(client.getVehicle());
+                for (Map.Entry<Character, List<Client>> listEntry : clientSchedule.entrySet()) {
+                        for (Client cli : listEntry.getValue()) {
+                                if (cli.equals(client)) {
+                                        listEntry.getValue().remove(client);
+                                }
+                        }
+                }
+        }
+        /*
+         * Remoção do veículo da lista
+         */
+        public void remove(Vehicle vehicle) {
+                for (Map.Entry<String, List<Vehicle>> listEntry : vehicleSchedule.entrySet()) {
+                        for (Vehicle veh : listEntry.getValue()) {
+                                if (veh.equals(vehicle)) {
+                                        listEntry.getValue().remove(vehicle);
+                                }
+                        }
+                }
+        }
+        /*
+         * Busca de cliente
+         * Compreendendo os requisitos:
+         *      Funcional 10
+         *      Complementar 08
+         *      De negócio 08
+         */
+        public Client find(String name) {
+                for (Client client : clientSchedule.get(name.charAt(0))) {
+                        if (client.getName().equals(name)) {
+                                return client;
+                        }
+                }
+                return null;
+        }
+        /*
+         * Getters e Setters
+         */
         public List<Client> getClients(Character key) {
                 return clientSchedule.get(key);
         }
