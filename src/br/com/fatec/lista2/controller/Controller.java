@@ -88,8 +88,8 @@ public class Controller {
                 }
         }
         // Para verificar se um objeto é nulo
-        <T> boolean isNull(T obj) {
-                return obj == null;
+        <T> boolean isNotNull(T obj) {
+                return obj != null;
         }
         /*
          * Confirmação do usuário
@@ -98,7 +98,7 @@ public class Controller {
         public boolean confirmOption() {
                 String opcao = getOption("Confirmar ? (S/n): ");
                 return opcao.equals("s") || opcao.equals("S")
-                        || opcao.equals(" ");
+                        || opcao.equals("");
         }
         /*
          * Adição, remoção e edição dos dados do cliente
@@ -109,8 +109,9 @@ public class Controller {
          */
         public void insertClient(Schedule schedule) {
                 Client novo = new Client();
-                editClientInfos(novo);
-                schedule.add(novo);
+                if (editClientInfos(novo)) {
+                        schedule.add(novo);
+                }
         }
         /*
          * Remoção de um cliente
@@ -140,9 +141,8 @@ public class Controller {
         /*
          * Edita as informações do cliente temporário
          */
-        private void editClientInfos(Client client) {
-                boolean opt = true;
-                while (opt) {
+        private boolean editClientInfos(Client client) {
+                while (true) {
                         switch (new Menu().editClient(client)) {
                                 case 1:
                                         client.setName(getOption("Insira o nome: "));
@@ -157,10 +157,14 @@ public class Controller {
                                         insertAddress(client);
                                         break;
                                 case 5:
-                                        break;
+                                        return false;
                                 case 6:
-                                        if (confirmOption()) {
-                                                opt = false;
+                                        if (!client.getName().equals("")) {
+                                                if (confirmOption()) {
+                                                        return true;
+                                                }
+                                        } else {
+                                                System.out.println("Insira o nome");
                                                 break;
                                         }
                                 default:
@@ -210,11 +214,15 @@ public class Controller {
          * Listagem de todos os clientes armazenados
          */
         public void listClients(Schedule schedule) {
-                System.out.println("\nLISTANDO TODOS OS CLIENTES\n");
-                for (Map.Entry<Character, List<Client>> clients : schedule.getClientMap().entrySet()) {
-                        for (Client client : clients.getValue()) {
-                                client.print();
+                if (!schedule.isEmpty()) {
+                        System.out.println("\nLISTANDO TODOS OS CLIENTES\n");
+                        for (Map.Entry<Character, List<Client>> clients : schedule.getClientMap().entrySet()) {
+                                for (Client client : clients.getValue()) {
+                                        client.print();
+                                }
                         }
+                } else {
+                        System.out.println("NENHUM CLIENTE CADASTRADO");
                 }
         }
         /*
@@ -243,7 +251,7 @@ public class Controller {
          */
         public void insertVehicle(Schedule schedule) {
                 Client tmp = schedule.find(getOption("Insira o nome do cliente: "));
-                if (!isNull(tmp)) {
+                if (isNotNull(tmp)) {
                         Vehicle tempVehicle = new Vehicle();
                         editVehicleInfos(tempVehicle);
                         tmp.setVehicle(tempVehicle);
@@ -257,7 +265,7 @@ public class Controller {
          */
         public void removeVehicle(Schedule schedule) {
                 Client tmp = schedule.find(getOption("Insira o nome do cliente: "));
-                if (!isNull(tmp)) {
+                if (isNotNull(tmp)) {
                         schedule.remove(tmp.getVehicle());
                 } else {
                         System.out.println("Cliente não encontrado");
@@ -268,7 +276,7 @@ public class Controller {
          */
         public void editVehicle(Schedule schedule) {
                 Client tmp = schedule.find(getOption("Insira o nome do cliente: "));
-                if (!isNull(tmp)) {
+                if (isNotNull(tmp)) {
                         editVehicleInfos(tmp.getVehicle());
                 } else {
                         System.out.println("Cliente não encontrado");
@@ -320,9 +328,11 @@ public class Controller {
                 double buff = doubleOption("Insira o preço de venda");
                 vehicle.setPurchasePrice(buff);
         }
-        /* ************************************* *
-         * Operações com arquivo                 *
-         * ************************************* *
+        /*
+         * ******************************************************************** *
+         *              Operações com arquivo                                   *
+         * ******************************************************************** *
+         *
          * Verifica se os arquivos existem.      */
         public void fileCheck() {
                 File pathToClients = new File("usr//clients");
@@ -359,40 +369,41 @@ public class Controller {
          * Salva os dados no arquivo                    *
          * Compreendendo as Regras de negócio 01 e 07   *
          * ******************************************** */
-        public void sync(Schedule schedule, Revisions revisions) {
-                try {
-                        sync(schedule);
-                        sync(revisions);
-                } catch (Exception e) {
-                        e.printStackTrace();
-                }
-        }
         /*
          * Insere os dados do cliente no arquivo
          */
-        private void sync(Schedule schedule) {
+        public void sync(Schedule schedule) {
                 File clientsFile = new File("usr//clients//clients.json");
                 try {
-                        // Objeto de escrita
-                        FileWriter clientsJSON = new FileWriter(clientsFile);
-                        // Array dos objetos json
-                        JSONArray clientsArray = new JSONArray();
-                        // Insere no array
-                        insertClients(schedule, clientsArray);
-                        // Escreve
-                        clientsJSON.write(clientsArray.toJSONString());
-                        clientsJSON.flush();
-                        clientsJSON.close();
-
+                        if (clientsFile.exists()) {
+                                eraseFile(clientsFile);
+                        }
+                        write(clientsFile, schedule);
                 } catch (IOException ioE) {
                         Logger.getLogger(schedule.getClass().getName()).log(Level.SEVERE, null, ioE);
                 }
         }
+        void eraseFile(File file) {
+                if (!file.delete()) {
+                        error("Apagando arquivo", false);
+                }
+        }
+        void write(File file, Schedule schedule) throws IOException {
+                // Objeto de escrita
+                FileWriter clientsJSON = new FileWriter(file);
+                JSONArray clientsArray = new JSONArray();
+                // Insere no array
+                insertClientIntoJSON(schedule, clientsArray);
+                // Escreve
+                clientsJSON.write(clientsArray.toJSONString());
+                clientsJSON.flush();
+                clientsJSON.close();
+        }
         // Inserção da agenda de clientes
         @SuppressWarnings("unchecked")
-        private void insertClients(Schedule schedule, JSONArray jsonArray) {
-                for (Map.Entry<Character,List<Client>> clientMap : schedule.getClientMap().entrySet()) {
-                        for (Client client : clientMap.getValue()) {
+        private void insertClientIntoJSON(Schedule schedule, JSONArray jsonArray) {
+                for (Map.Entry<Character, List<Client>> clients : schedule.getClientMap().entrySet()) {
+                        for (Client client : clients.getValue()) {
                                 JSONObject jsonObject = new JSONObject();
                                 putClientIntoJSON(client, jsonObject);
                                 jsonArray.add(jsonObject);

@@ -17,6 +17,8 @@
  */
 package br.com.fatec.lista2.model;
 
+import br.com.fatec.lista2.controller.Controller;
+
 import java.util.*;
 
 /*
@@ -38,6 +40,20 @@ public class Schedule {
                 vehicleSchedule = new HashMap<>();
         }
         /*
+         * Retorna a quantidade de elementos dentro da lista
+         */
+        public int size() {
+                int counter = 0;
+                for (Map.Entry<Character,List<Client>> i : clientSchedule.entrySet()) {
+                        counter += i.getValue().size();
+                }
+                return counter;
+        }
+
+        public boolean isEmpty() {
+                return size() <= 0;
+        }
+        /*
          * Adiciona um novo cliente, junto com seu carro
          * Compreendendo o requisito funcional 01
          */
@@ -48,6 +64,7 @@ public class Schedule {
                         addIntoNewList(client);
                 }
                 add(client.getVehicle());
+                new Controller().sync(this);
         }
 
         boolean scheduleContainsKey(Client client) {
@@ -104,12 +121,9 @@ public class Schedule {
                 // o seu veículo.
                 remove(client.getVehicle());
                 for (Map.Entry<Character, List<Client>> listEntry : clientSchedule.entrySet()) {
-                        for (Client cli : listEntry.getValue()) {
-                                if (cli.equals(client)) {
-                                        listEntry.getValue().remove(client);
-                                }
-                        }
+                        listEntry.getValue().removeIf(cli -> cli.getName().equals(client.getName()));
                 }
+                new Controller().sync(this);
         }
         /*
          * Remoção do veículo da lista
