@@ -42,23 +42,11 @@ public class Controller {
         // Input com mensagem
         public String getOption(String message) {
                 System.out.print(message);
-                String opt = scan.nextLine();
-                if (opt.length() > 0) {
-                        return opt;
-                } else {
-                        System.out.println("Insira um valor.");
-                        return " ";
-                }
+                return scan.nextLine();
         }
         public String getOption() {
                 System.out.print("Insira a sua opção: ");
-                String opt = scan.nextLine();
-                if (opt.length() > 0) {
-                        return opt;
-                } else {
-                        System.out.println("Insira um valor.");
-                        return " ";
-                }
+                return scan.nextLine();
         }
         // Para verificar se o valor digitado é número
         public boolean isNumber(String string) {
@@ -80,7 +68,7 @@ public class Controller {
         public boolean confirmOption() {
                 String opcao = getOption("Confirmar ? (S/n): ");
                 return opcao.equals("s") || opcao.equals("S")
-                        || opcao.equals("");
+                        || opcao.equals(" ");
         }
         /*
          * Adição, remoção e edição dos dados do cliente
@@ -123,10 +111,9 @@ public class Controller {
          * Edita as informações do cliente temporário
          */
         private void editClientInfos(Client client) {
-                int opt = 0;
-                while (opt != 5) {
-                        opt = new Menu().editClient(client);
-                        switch (opt) {
+                boolean opt = true;
+                while (opt) {
+                        switch (new Menu().editClient(client)) {
                                 case 1:
                                         client.setName(getOption("Insira o nome: "));
                                         break;
@@ -143,7 +130,8 @@ public class Controller {
                                         break;
                                 case 6:
                                         if (confirmOption()) {
-                                                return;
+                                                opt = false;
+                                                break;
                                         }
                                 default:
                                         System.out.println("\nInsira uma opção válida");
@@ -163,11 +151,9 @@ public class Controller {
         // Insere as informações de endereço do cliente
         private void insertAddress(Client client) {
                 Address temp = new Address();
-                Menu menu = new Menu();
-                int opt = 0;
-                while (opt != 7) {
-                        opt = menu.editClientAddress(client);
-                        switch (opt) {
+                boolean opt = true;
+                while (opt) {
+                        switch (new Menu().editClientAddress(temp)) {
                                 case 1: temp.setStreet(getOption("Insira a rua: ")); break;
                                 case 2: temp.setNumber(getOption("Insira o número: ")); break;
                                 case 3: temp.setComplement(getOption("Insira o complemento: ")); break;
@@ -183,7 +169,8 @@ public class Controller {
                                 case 8:
                                         if (confirmOption()) {
                                                 client.setAddress(temp);
-                                                return;
+                                                opt = false;
+                                                break;
                                         }
 
                         }

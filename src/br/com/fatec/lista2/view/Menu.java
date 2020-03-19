@@ -1,6 +1,7 @@
 package br.com.fatec.lista2.view;
 
 import br.com.fatec.lista2.controller.Controller;
+import br.com.fatec.lista2.model.Address;
 import br.com.fatec.lista2.model.Client;
 import br.com.fatec.lista2.model.Phone;
 
@@ -49,9 +50,9 @@ public class Menu {
         /*
          * Menu de inserção/edição de endereço
          */
-        public int editClientAddress(Client client) {
+        public int editClientAddress(Address address) {
                 // Informações temporárias de endereço
-                client.getAddress().print();
+                address.print();
                 System.out.println("\nInsira a opção correspoondente\n"
                         + "\t1. Inserir rua\n"
                         + "\t2. Inserir Número\n"
