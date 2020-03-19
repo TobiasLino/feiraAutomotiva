@@ -17,10 +17,8 @@
  */
 package br.com.fatec.lista2.controller;
 
-import br.com.fatec.lista2.model.Client;
-import br.com.fatec.lista2.model.Review;
-import br.com.fatec.lista2.model.Revisions;
-import br.com.fatec.lista2.model.Schedule;
+import br.com.fatec.lista2.model.*;
+import br.com.fatec.lista2.view.Menu;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -44,7 +42,152 @@ public class Controller {
         // Input com mensagem
         public String getOption(String message) {
                 System.out.print(message);
-                return scan.nextLine();
+                String opt = scan.nextLine();
+                if (opt.length() > 0) {
+                        return opt;
+                } else {
+                        System.out.println("Insira um valor.");
+                        return " ";
+                }
+        }
+        public String getOption() {
+                System.out.print("Insira a sua opção: ");
+                String opt = scan.nextLine();
+                if (opt.length() > 0) {
+                        return opt;
+                } else {
+                        System.out.println("Insira um valor.");
+                        return " ";
+                }
+        }
+        // Para verificar se o valor digitado é número
+        public boolean isNumber(String string) {
+                return string.matches("[0-9]*");
+        }
+        // Retorna o valor digitado em inteiro
+        public int intOption() {
+                String opt = getOption();
+                if (!opt.equals("") && isNumber(opt)) {
+                        return Integer.parseInt(opt);
+                } else {
+                        return 0;
+                }
+        }
+        /*
+         * Confirmação do usuário
+         * Compreendendo as Regras de negócio 04 e 05
+         */
+        public boolean confirmOption() {
+                String opcao = getOption("Confirmar ? (S/n): ");
+                return opcao.equals("s") || opcao.equals("S")
+                        || opcao.equals("");
+        }
+        /*
+         * Adição, remoção e edição dos dados do cliente
+         */
+        /*
+         * Adição de um cliente
+         * Compreendendo o requisito Funcional 01
+         */
+        public void insertClient(Schedule schedule) {
+                Client novo = new Client();
+                editClientInfos(novo);
+                schedule.add(novo);
+        }
+        /*
+         * Remoção de um cliente
+         * Compreendendo o Requisito Funcional 02
+         */
+        public void removeClient(Schedule schedule) {
+                Client tmp = schedule.find(getOption("\nInsira o nome do cliente: "));
+                if (tmp != null) {
+                        if (confirmOption()) {
+                                schedule.remove(tmp);
+                        }
+                } else {
+                        System.out.println("Cliente não encontrado");
+                }
+        }
+        /*
+         * Edição de um cliente
+         */
+        public void editClient(Schedule schedule) {
+                Client tmp = schedule.find(getOption("\nInsira o nome do cliente: "));
+                if (tmp != null) {
+                        editClientInfos(tmp);
+                } else {
+                        System.out.println("Cliente não encontrado");
+                }
+        }
+        /*
+         * Edita as informações do cliente temporário
+         */
+        private void editClientInfos(Client client) {
+                int opt = 0;
+                while (opt != 5) {
+                        opt = new Menu().editClient(client);
+                        switch (opt) {
+                                case 1:
+                                        client.setName(getOption("Insira o nome: "));
+                                        break;
+                                case 2:
+                                        client.getPhone().setNumber(insertPhone());
+                                        break;
+                                case 3:
+                                        client.setCpf(getOption("Insira o cpf: "));
+                                        break;
+                                case 4:
+                                        insertAddress(client);
+                                        break;
+                                case 5:
+                                        break;
+                                case 6:
+                                        if (confirmOption()) {
+                                                return;
+                                        }
+                                default:
+                                        System.out.println("\nInsira uma opção válida");
+                        }
+                }
+        }
+        // Retorna o número de telefone digitado
+        private String insertPhone() {
+                String opt = getOption("Insira o telefone: ");
+                if (isNumber(opt)) {
+                        return opt;
+                } else {
+                        System.out.println("Insira um valor numérico.");
+                        return insertPhone();
+                }
+        }
+        // Insere as informações de endereço do cliente
+        private void insertAddress(Client client) {
+                Address temp = new Address();
+                Menu menu = new Menu();
+                int opt = 0;
+                while (opt != 7) {
+                        opt = menu.editClientAddress(client);
+                        switch (opt) {
+                                case 1: temp.setStreet(getOption("Insira a rua: ")); break;
+                                case 2: temp.setNumber(getOption("Insira o número: ")); break;
+                                case 3: temp.setComplement(getOption("Insira o complemento: ")); break;
+                                case 4: temp.setNeighborhood(getOption("Insira o Bairro: ")); break;
+                                case 5: temp.setCity(getOption("Insira a cidade: ")); break;
+                                case 6:
+                                        String state = getOption("Insira a sigla do estado: ");
+                                        if (state.length() < 2) {
+                                                temp.setState(state);
+                                                break;
+                                        }
+                                case 7: break;
+                                case 8:
+                                        if (confirmOption()) {
+                                                client.setAddress(temp);
+                                                return;
+                                        }
+
+                        }
+                }
         }
         // Impressão de erros com controle de saída do programa.
         public void error(String message, boolean fatality) {
