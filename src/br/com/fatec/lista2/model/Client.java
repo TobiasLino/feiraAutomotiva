@@ -26,6 +26,7 @@ public class Client {
         private Phone phone;
         private Address address;
         private Vehicle vehicle;
+        private Review nextReview;
 
         public Client() {
                 name = "";
@@ -33,6 +34,8 @@ public class Client {
                 phone = new Phone();
                 address = new Address();
                 vehicle = new Vehicle();
+                vehicle.setClient(this);
+                nextReview = new Review(this);
         }
         // Impressão dos dados
         public void print() {
@@ -84,5 +87,14 @@ public class Client {
 
         public void setVehicle(Vehicle vehicle) {
                 this.vehicle = vehicle;
+                this.vehicle.setClient(this);
+        }
+
+        public Review getNextReview() {
+                return nextReview;
+        }
+
+        public void setNextReview(Review nextReview) {
+                this.nextReview = nextReview;
         }
 }

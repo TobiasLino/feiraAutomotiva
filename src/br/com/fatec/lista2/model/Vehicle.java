@@ -30,6 +30,7 @@ public class Vehicle {
         private String brand;
         private Calendar yearOfManufacture;
         private double purchasePrice;
+        private Client client;
 
         public Vehicle() {
                 licensePlate = "";
@@ -40,12 +41,12 @@ public class Vehicle {
         }
         // Impressão dos dados
         public void print() {
-                System.out.println("Dados do Veículo.\n"
-                        + "\tPlaca:             " + licensePlate + "\n"
-                        + "\tMarca:             " + brand + "\n"
-                        + "\tModelo/Versão:     " + modelVersion + "\n"
-                        + "\tAno de Fabricação: " + yearOfManufacture.get(Calendar.YEAR) + "\n"
-                        + "\tPreço de Compra:   " + purchasePrice
+                System.out.println("\tDados do Veículo.\n"
+                        + "\t\tPlaca:             " + licensePlate + "\n"
+                        + "\t\tMarca:             " + brand + "\n"
+                        + "\t\tModelo/Versão:     " + modelVersion + "\n"
+                        + "\t\tAno de Fabricação: " + yearOfManufacture.get(Calendar.YEAR) + "\n"
+                        + "\t\tPreço de Compra:   " + purchasePrice
                 );
         }
         /*
@@ -89,5 +90,13 @@ public class Vehicle {
 
         public double getPurchasePrice() {
                 return purchasePrice;
+        }
+
+        public void setClient(Client client) {
+                this.client = client;
+        }
+
+        public Client getClient() {
+                return client;
         }
 }

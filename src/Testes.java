@@ -1,9 +1,12 @@
+import br.com.fatec.lista2.controller.Controller;
 import br.com.fatec.lista2.model.*;
 
 import java.util.Calendar;
-import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class Testes {
+        public static void printa(Calendar n) {
+                System.out.println(n.getTime().toString());
+        }
         public static void main(String[] args) {
                 Client c = new Client();
                 c.setName("Tobias");
@@ -38,8 +41,8 @@ public class Testes {
                 Client c3 = new Client();
                 c3.setName("Tabata");
                 Vehicle v2 = new Vehicle();
-                v2.setBrand("Volkswagen");
-                v2.setModelVersion("Gol");
+                v2.setBrand("Chevrolet");
+                v2.setModelVersion("Celta");
                 c3.setVehicle(v2);
                 Client c4 = new Client();
                 c4.setName("Amanda");
@@ -50,6 +53,37 @@ public class Testes {
                 agenda.add(c3);
                 agenda.add(c4);
 
-                c.print();
+
+                Review r = new Review(c);
+                Calendar s = Calendar.getInstance();
+                s.set(Calendar.DAY_OF_MONTH,19);
+                s.set(Calendar.MONTH, 2);
+                s.set(Calendar.YEAR, 2020);
+                r.setReviewDate(s);
+
+                Review r2 = new Review(c2);
+                Calendar s2 = Calendar.getInstance();
+                s2.set(Calendar.DAY_OF_MONTH,18);
+                s2.set(Calendar.MONTH, 2);
+                s2.set(Calendar.YEAR, 2020);
+                r2.setReviewDate(s2);
+
+                Review r3 = new Review(c3);
+                Calendar s3 = Calendar.getInstance();
+                s3.set(Calendar.DAY_OF_MONTH,17);
+                s3.set(Calendar.MONTH, 2);
+                s3.set(Calendar.YEAR, 2020);
+                r3.setReviewDate(s3);
+
+                Revisions rev = new Revisions();
+                rev.add(r);
+                rev.add(r2);
+                rev.add(r3);
+
+                Controller ctrl = new Controller();
+                // String str = ctrl.getOption("Ola:");
+                ctrl.fileCheck();
+
+                ctrl.sync(agenda, rev);
         }
 }

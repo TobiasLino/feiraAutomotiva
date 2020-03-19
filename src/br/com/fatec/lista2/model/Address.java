@@ -37,13 +37,13 @@ public class Address {
         }
         // Impressão dos dados
         public void print() {
-                System.out.println("Endereço\n"
-                        + "\tRua:         " + street + "\n"
-                        + "\tNúmero:      " + number + "\n"
-                        + "\tComplemento: " + complement + "\n"
-                        + "\tBairro:      " + neighborhood + "\n"
-                        + "\tCidade:      " + city + "\n"
-                        + "\tEstado:       " + state
+                System.out.println("\tEndereço\n"
+                        + "\t\tRua:         " + street + "\n"
+                        + "\t\tNúmero:      " + number + "\n"
+                        + "\t\tComplemento: " + complement + "\n"
+                        + "\t\tBairro:      " + neighborhood + "\n"
+                        + "\t\tCidade:      " + city + "\n"
+                        + "\t\tEstado:       " + state
                 );
         }
         /*

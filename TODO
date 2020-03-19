@@ -1,0 +1,16 @@
+O que o sistema precisa fazer quando inicializar:
+    1 - Colocar os clientes e seus devidos carros na agenda.
+    2 - Verificar as datas agendadas no arquivo nextRevisions
+        Se (a data for anterior ao dia corrente) {
+            será escrita no arquivo previousRevisions
+        } se não {
+            ficará armazenada na Revisions
+        }
+
+Criação dos menus.
+
+Geração de relatórios
+    Os relatórios serão gerados para cada cliente
+        É necessário buscar as revisões antigas do cliente.
+
+Adição do atributo de serviço para cada revisão.
