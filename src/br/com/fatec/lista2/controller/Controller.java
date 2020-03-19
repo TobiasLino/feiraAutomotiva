@@ -442,7 +442,7 @@ public class Controller {
                 for (Object o : jsonArray) {
                         JSONObject object = (JSONObject) o;
                         client.getVehicle().setLicensePlate(object.get("licensePlate").toString());
-                        client.getVehicle().setModelVersion(object.get("modleVersion").toString());
+                        client.getVehicle().setModelVersion(object.get("modelVersion").toString());
                         client.getVehicle().setBrand(object.get("brand").toString());
                         Calendar cal = Calendar.getInstance();
                         cal.set(Calendar.YEAR, Integer.parseInt(object.get("yearOfManufacture").toString()));
