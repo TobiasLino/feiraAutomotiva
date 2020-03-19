@@ -123,4 +123,12 @@ public class Schedule {
         public List<Vehicle> getVehicles(String key) {
                 return vehicleSchedule.get(key);
         }
+
+        public Map<Character, List<Client>> getClientMap() {
+                return clientSchedule;
+        }
+
+        public Map<String, List<Vehicle>> getVehicleMap() {
+                return vehicleSchedule;
+        }
 }

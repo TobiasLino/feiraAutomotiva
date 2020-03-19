@@ -17,6 +17,8 @@
  */
 package br.com.fatec.lista2.model;
 
+import br.com.fatec.lista2.controller.Controller;
+
 import java.util.*;
 
 /*
@@ -36,11 +38,16 @@ public class Revisions {
          * Compreendendo o requisito funcional 06
          */
         public void add(Review review) {
-                if (revisions.containsKey(review.getClient())) {
-                        revisions.get(review.getClient()).add(review);
-                } else {
-                        revisions.put(review.getClient(), new LinkedList<>());
-                        revisions.get(review.getClient()).add(review);
+                // Verifica se a data da revisão está marcada para depois do dia atual.
+                if (review.getReviewDate().getTime().after(new Date())) {
+                        if (revisions.containsKey(review.getClient())) {
+                                revisions.get(review.getClient()).add(review);
+                                // Ordena por data
+                                revisions.get(review.getClient()).sort(Comparator.comparing(Review::getReviewDate));
+                        } else {
+                                revisions.put(review.getClient(), new LinkedList<>());
+                                revisions.get(review.getClient()).add(review);
+                        }
                 }
         }
 
@@ -51,7 +58,7 @@ public class Revisions {
                 return revisions;
         }
 
-        public void setRevisions(Map<Client, List<Review>> revisionsPerClient) {
-                this.revisions = revisionsPerClient;
+        public Map<Client, List<Review>> getMap() {
+                return revisions;
         }
 }

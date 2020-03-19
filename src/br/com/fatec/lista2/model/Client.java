@@ -35,6 +35,7 @@ public class Client {
                 address = new Address();
                 vehicle = new Vehicle();
                 vehicle.setClient(this);
+                nextReview = new Review(this);
         }
         // Impressão dos dados
         public void print() {

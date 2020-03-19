@@ -29,8 +29,8 @@ public class Review {
         private Vehicle vehicle;
         private Calendar reviewDate;
 
-        public Review() {
-                client = new Client();
+        public Review(Client client) {
+                this.client = client;
                 vehicle = client.getVehicle();
                 reviewDate = Calendar.getInstance();
         }
