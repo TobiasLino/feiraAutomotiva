@@ -47,10 +47,12 @@ public class Schedule {
                         // ordena
                         clientSchedule.get(client.getName().charAt(0)).sort(Comparator.comparing(Client::getName));
                         // adiciona o veículo do cliente na lista de veículos
+                        add(client.getVehicle());
                 } else {
                         clientSchedule.put(client.getName().charAt(0), new LinkedList<>());
                         clientSchedule.get(client.getName().charAt(0)).add(client);
                         // não precisa ordenar pois só tem um único cliente.
+                        add(client.getVehicle());
                 }
                 add(client.getVehicle());
         }

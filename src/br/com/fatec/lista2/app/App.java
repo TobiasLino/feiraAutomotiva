@@ -34,14 +34,16 @@ public class App {
                 Controller ctrl = new Controller();
                 // Verifica os arquivos de dados
                 ctrl.fileCheck();
+                // Passa os dados para as estruturas
+                ctrl.recover(schedule, revisions);
                 // menu principal
                 while (true) {
                         switch (new Menu().mainMenu()) {
                                 case 1: ctrl.insertClient(schedule); break;
                                 case 2: ctrl.removeClient(schedule); break;
                                 case 3: ctrl.editClient(schedule); break;
-                                case 4: break;
-                                case 5: break;
+                                case 4: ctrl.listClients(schedule); break;
+                                case 5: ctrl.search(schedule); break;
                                 case 6: break;
                                 case 7: break;
                                 case 8: break;
