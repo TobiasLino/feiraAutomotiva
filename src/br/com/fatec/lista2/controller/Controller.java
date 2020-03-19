@@ -21,10 +21,10 @@ import br.com.fatec.lista2.model.*;
 import br.com.fatec.lista2.view.Menu;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,6 +38,14 @@ public class Controller {
 
         public Controller() {
                 scan = new Scanner(System.in);
+        }
+
+        // Impressão de erros com controle de saída do programa.
+        public void error(String message, boolean fatality) {
+                System.err.println("ERROR: " + message);
+                if (fatality) {
+                        System.exit(1);
+                }
         }
         // Input com mensagem
         public String getOption(String message) {
@@ -176,16 +184,38 @@ public class Controller {
                         }
                 }
         }
-        // Impressão de erros com controle de saída do programa.
-        public void error(String message, boolean fatality) {
-                System.err.println("ERROR: " + message);
-                if (fatality) {
-                        System.exit(1);
+        /*
+         * Listagem de todos os clientes armazenados
+         */
+        public void listClients(Schedule schedule) {
+                System.out.println("\nLISTANDO TODOS OS CLIENTES\n");
+                for (Map.Entry<Character, List<Client>> clients : schedule.getClientMap().entrySet()) {
+                        for (Client client : clients.getValue()) {
+                                client.print();
+                        }
                 }
         }
         /*
-         * Operações com arquivo
-         *
+         * Busca de clientes
+         * Compreendendo os requisitos:
+         *      Funcionais 10
+         *      Complementares 08
+         *      De Negócio 08
+         */
+        public void search(Schedule schedule) {
+                String name = getOption("Insira o nome do Cliente [Enter para sair] : ");
+                if (!name.equals("")) {
+                        Client tmp = schedule.find(name);
+                        if (tmp != null) {
+                                tmp.print();
+                        } else {
+                                System.out.println("Cliente não encontrado");
+                        }
+                }
+        }
+        /* ************************************* *
+         * Operações com arquivo                 *
+         * ************************************* *
          * Verifica se os arquivos existem.      */
         public void fileCheck() {
                 File pathToClients = new File("usr//clients");
@@ -218,10 +248,10 @@ public class Controller {
                         }
                 }
         }
-        /*
-         * Salva os dados no arquivo
-         * Compreendendo as Regras de negócio 01 e 07
-         */
+        /* ******************************************** *
+         * Salva os dados no arquivo                    *
+         * Compreendendo as Regras de negócio 01 e 07   *
+         * ******************************************** */
         public void sync(Schedule schedule, Revisions revisions) {
                 try {
                         sync(schedule);
@@ -351,5 +381,73 @@ public class Controller {
                 putClientIntoJSON(client, reviewClient);
                 reviewClientArray.add(reviewClient);
                 jsonObject.put("client",reviewClientArray);
+        }
+        /* ******************************
+         * Recupera os dados do arquivo *
+         * Compreendendo os requisitos: *
+         *      Complementares 03 04    *
+         * **************************** */
+        public void recover(Schedule schedule, Revisions revisions) {
+                File clientsFile = new File("usr//clients//clients.json");
+                JSONParser jsonParser = new JSONParser();
+                try {
+                        recover(schedule, clientsFile, jsonParser);
+                } catch (Exception exp) {
+                        exp.printStackTrace();
+                }
+
+        }
+        // Recuperação dos dados dos clientes
+        private void recover(Schedule schedule, File clientsFile, JSONParser jsonParser) throws IOException, ParseException {
+                JSONArray jsonArray;
+                // Verifica se o arquivo está vazio
+                if (clientsFile.length() > 0) {
+                        FileReader arquivoJSON = new FileReader(clientsFile);
+                        Object obj = jsonParser.parse(arquivoJSON);
+                        if (obj instanceof JSONArray) {
+                                jsonArray = (JSONArray) obj;
+                                for (Object o : jsonArray) {
+                                        JSONObject jsonObject = (JSONObject) o;
+                                        getJSON(jsonObject, schedule);
+                                }
+                        }
+                }
+        }
+        private void getJSON(JSONObject jsonObject, Schedule schedule) {
+                Client tmp = new Client();
+                tmp.setName(jsonObject.get("name").toString());
+                tmp.setCpf(jsonObject.get("cpf").toString());
+                Phone phone = new Phone();
+                phone.setNumber(jsonObject.get("phone").toString());
+                tmp.setPhone(phone);
+                getAddressFromJSON(jsonObject, tmp);
+                getVehicleFromJSON(jsonObject, tmp);
+
+                schedule.add(tmp);
+        }
+        private void getAddressFromJSON(JSONObject jsonObject, Client client) {
+                JSONArray jsonArray = (JSONArray) jsonObject.get("address");
+                for (Object o : jsonArray) {
+                        JSONObject object = (JSONObject) o;
+                        client.getAddress().setStreet(object.get("street").toString());
+                        client.getAddress().setNumber(object.get("number").toString());
+                        client.getAddress().setComplement(object.get("complement").toString());
+                        client.getAddress().setNeighborhood(object.get("neighborhood").toString());
+                        client.getAddress().setCity(object.get("city").toString());
+                        client.getAddress().setState(object.get("state").toString());
+                }
+        }
+        private void getVehicleFromJSON(JSONObject jsonObject, Client client) {
+                JSONArray jsonArray = (JSONArray) jsonObject.get("vehicle");
+                for (Object o : jsonArray) {
+                        JSONObject object = (JSONObject) o;
+                        client.getVehicle().setLicensePlate(object.get("licensePlate").toString());
+                        client.getVehicle().setModelVersion(object.get("modleVersion").toString());
+                        client.getVehicle().setBrand(object.get("brand").toString());
+                        Calendar cal = Calendar.getInstance();
+                        cal.set(Calendar.YEAR, Integer.parseInt(object.get("yearOfManufacture").toString()));
+                        client.getVehicle().setYearOfManufacture(cal);
+                        client.getVehicle().setPurchasePrice(Double.parseDouble(object.get("purchasePrice").toString()));
+                }
         }
 }
