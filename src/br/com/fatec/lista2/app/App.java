@@ -44,9 +44,9 @@ public class App {
                                 case 3: ctrl.editClient(schedule); break;
                                 case 4: ctrl.listClients(schedule); break;
                                 case 5: ctrl.search(schedule); break;
-                                case 6: break;
-                                case 7: break;
-                                case 8: break;
+                                case 6: ctrl.insertVehicle(schedule); break;
+                                case 7: ctrl.removeVehicle(schedule); break;
+                                case 8: ctrl.editVehicle(schedule); break;
                                 case 9: break;
                                 case 10: break;
                                 case 11: break;

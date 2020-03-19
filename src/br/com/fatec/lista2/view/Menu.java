@@ -4,6 +4,7 @@ import br.com.fatec.lista2.controller.Controller;
 import br.com.fatec.lista2.model.Address;
 import br.com.fatec.lista2.model.Client;
 import br.com.fatec.lista2.model.Phone;
+import br.com.fatec.lista2.model.Vehicle;
 
 public class Menu {
         /*
@@ -63,5 +64,20 @@ public class Menu {
                         + "\t7. Cancelar\n"
                         + "\t8. Salvar\n");
                 return new Controller().intOption();
+        }
+        /*
+         * Menu de edição do veículo
+         */
+        public int editVehicle(Vehicle vehicle) {
+                vehicle.print();
+                System.out.println("\nInsira a opção correspondente\n"
+                        + "\t1. Inserir Modelo/Versão\n"
+                        + "\t2. Inserir Marca\n"
+                        + "\t3. Inserir placa\n"
+                        + "\t4. Inserir Ano de Fabricação\n"
+                        + "\t5. Inserir Preço de venda\n"
+                        + "\t6. Inserir Cancelar\n"
+                        + "\t7. Inserir Salvar\n");
+                return  new Controller().intOption();
         }
 }

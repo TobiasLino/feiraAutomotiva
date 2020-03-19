@@ -69,6 +69,28 @@ public class Controller {
                         return 0;
                 }
         }
+        // Retorna o valor digitado em inteiro com mensagem
+        public int intOption(String message) {
+                String opt = getOption(message);
+                if (!opt.equals("") && isNumber(opt)) {
+                        return Integer.parseInt(opt);
+                } else {
+                        return 0;
+                }
+        }
+        // Retorna o valor digitado em double com mensagem
+        public double doubleOption(String message) {
+                String opt = getOption(message);
+                if (!opt.equals("") && isNumber(opt)) {
+                        return Double.parseDouble(opt);
+                } else {
+                        return 0;
+                }
+        }
+        // Para verificar se um objeto é nulo
+        <T> boolean isNull(T obj) {
+                return obj == null;
+        }
         /*
          * Confirmação do usuário
          * Compreendendo as Regras de negócio 04 e 05
@@ -212,6 +234,91 @@ public class Controller {
                                 System.out.println("Cliente não encontrado");
                         }
                 }
+        }
+        /*
+         * Adiciona um veículo
+         * Compreendendo o requisito funcional 04
+         *      e Complementares 05
+         *      e de Negócio 03
+         */
+        public void insertVehicle(Schedule schedule) {
+                Client tmp = schedule.find(getOption("Insira o nome do cliente: "));
+                if (!isNull(tmp)) {
+                        Vehicle tempVehicle = new Vehicle();
+                        editVehicleInfos(tempVehicle);
+                        tmp.setVehicle(tempVehicle);
+                } else {
+                        System.out.println("Cliente não encontrado");
+                }
+        }
+        /*
+         * Remove o veículo
+         * Compreendendo o requisito funcional 03
+         */
+        public void removeVehicle(Schedule schedule) {
+                Client tmp = schedule.find(getOption("Insira o nome do cliente: "));
+                if (!isNull(tmp)) {
+                        schedule.remove(tmp.getVehicle());
+                } else {
+                        System.out.println("Cliente não encontrado");
+                }
+        }
+        /*
+         * Edita os dados do veículo
+         */
+        public void editVehicle(Schedule schedule) {
+                Client tmp = schedule.find(getOption("Insira o nome do cliente: "));
+                if (!isNull(tmp)) {
+                        editVehicleInfos(tmp.getVehicle());
+                } else {
+                        System.out.println("Cliente não encontrado");
+                }
+        }
+        /*
+         * Edita os dados do veículo temporário
+         */
+        private void editVehicleInfos(Vehicle vehicle) {
+                Vehicle tmp = new Vehicle();
+                boolean exit = false;
+                while (!exit) {
+                        switch (new Menu().editVehicle(tmp)) {
+                                case 1: insertModel(tmp); break;
+                                case 2: insertBrand(tmp); break;
+                                case 3: insertLicensePlate(tmp); break;
+                                case 4: insertYearOfManufature(tmp); break;
+                                case 5: insertPurchasePrice(tmp); break;
+                                case 6: exit = true; break;
+                                case 7:
+                                        if (confirmOption()) {
+                                                tmp.setClient(vehicle.getClient());
+                                                vehicle = tmp;
+                                                exit = true;
+                                                break;
+                                        }
+                        }
+                }
+        }
+        void insertModel(Vehicle vehicle) {
+                String buff = getOption("Insira o modelo/versão: ");
+                vehicle.setModelVersion(buff);
+        }
+        void insertBrand(Vehicle vehicle) {
+                String buff = getOption("Insira a marca: ");
+                vehicle.setBrand(buff);
+        }
+        void insertLicensePlate(Vehicle vehicle) {
+                String buff = getOption("Insira a placa: ");
+                vehicle.setLicensePlate(buff);
+        }
+        void insertYearOfManufature(Vehicle vehicle) {
+                int buff = intOption("Insira o ano de fabricação");
+                Calendar cal = Calendar.getInstance();
+                cal.set(Calendar.YEAR, buff);
+                vehicle.setYearOfManufacture(cal);
+        }
+        void insertPurchasePrice(Vehicle vehicle) {
+                double buff = doubleOption("Insira o preço de venda");
+                vehicle.setPurchasePrice(buff);
         }
         /* ************************************* *
          * Operações com arquivo                 *
@@ -401,17 +508,26 @@ public class Controller {
         private void recover(Schedule schedule, File clientsFile, JSONParser jsonParser) throws IOException, ParseException {
                 JSONArray jsonArray;
                 // Verifica se o arquivo está vazio
-                if (clientsFile.length() > 0) {
-                        FileReader arquivoJSON = new FileReader(clientsFile);
-                        Object obj = jsonParser.parse(arquivoJSON);
+                if (fileIsNotEmpty(clientsFile)) {
+                        Object obj = parseFromJSON(clientsFile, jsonParser);
                         if (obj instanceof JSONArray) {
                                 jsonArray = (JSONArray) obj;
                                 for (Object o : jsonArray) {
-                                        JSONObject jsonObject = (JSONObject) o;
-                                        getJSON(jsonObject, schedule);
+                                        insertIntoSchedule(schedule, o);
                                 }
                         }
                 }
+        }
+        boolean fileIsNotEmpty(File file) {
+                return file.length() > 0;
+        }
+        Object parseFromJSON(File file, JSONParser jsonParser) throws IOException, ParseException {
+                FileReader arquivoJSON = new FileReader(file);
+                return  jsonParser.parse(arquivoJSON);
+        }
+        void insertIntoSchedule(Schedule schedule, Object object) {
+                JSONObject jsonObject = (JSONObject) object;
+                getJSON(jsonObject, schedule);
         }
         private void getJSON(JSONObject jsonObject, Schedule schedule) {
                 Client tmp = new Client();

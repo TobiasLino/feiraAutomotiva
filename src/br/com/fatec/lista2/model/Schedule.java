@@ -42,35 +42,58 @@ public class Schedule {
          * Compreendendo o requisito funcional 01
          */
         public void add(Client client) {
-                if (clientSchedule.containsKey(client.getName().charAt(0))) {
-                        clientSchedule.get(client.getName().charAt(0)).add(client);
-                        // ordena
-                        clientSchedule.get(client.getName().charAt(0)).sort(Comparator.comparing(Client::getName));
-                        // adiciona o veículo do cliente na lista de veículos
-                        add(client.getVehicle());
+                if (scheduleContainsKey(client)) {
+                        addIntoExistingScheduleList(client);
                 } else {
-                        clientSchedule.put(client.getName().charAt(0), new LinkedList<>());
-                        clientSchedule.get(client.getName().charAt(0)).add(client);
-                        // não precisa ordenar pois só tem um único cliente.
-                        add(client.getVehicle());
+                        addIntoNewList(client);
                 }
                 add(client.getVehicle());
         }
+
+        boolean scheduleContainsKey(Client client) {
+                return clientSchedule.containsKey(client.getName().charAt(0));
+        }
+
+        void addIntoExistingScheduleList(Client client) {
+                clientSchedule.get(client.getName().charAt(0)).add(client);
+                // ordena pelo nome do cliente
+                clientSchedule.get(client.getName().charAt(0)).sort(Comparator.comparing(Client::getName));
+        }
+
+        void addIntoNewList(Client client) {
+                clientSchedule.put(client.getName().charAt(0), new LinkedList<>());
+                clientSchedule.get(client.getName().charAt(0)).add(client);
+        }
+
         /*
          * Adiciona um veículo no map
          * Compreendendo o requisito funcional 04
          */
         public void add(Vehicle vehicle) {
-                if (!vehicle.getBrand().equals("")) {
-                        if (vehicleSchedule.containsKey(vehicle.getBrand())) {
-                                vehicleSchedule.get(vehicle.getBrand()).add(vehicle);
-                                // ordena
-                                vehicleSchedule.get(vehicle.getBrand()).sort(Comparator.comparing(Vehicle::getModelVersion));
+                if (brandIsNotEmpty(vehicle)) {
+                        if (scheduleContainsKey(vehicle)) {
+                                addIntoExistingScheduleList(vehicle);
                         } else {
-                                vehicleSchedule.put(vehicle.getBrand(), new LinkedList<>());
-                                vehicleSchedule.get(vehicle.getBrand()).add(vehicle);
+                                addIntoNewList(vehicle);
                         }
                 }
+        }
+        boolean scheduleContainsKey(Vehicle vehicle) {
+                return vehicleSchedule.containsKey(vehicle.getBrand());
+        }
+        boolean brandIsNotEmpty(Vehicle vehicle) {
+                return !vehicle.getBrand().equals("");
+        }
+        void addIntoExistingScheduleList(Vehicle vehicle) {
+                vehicleSchedule.get(vehicle.getBrand()).add(vehicle);
+                // ordena pela versão
+                vehicleSchedule.get(vehicle.getBrand()).sort(Comparator.comparing(Vehicle::getModelVersion));
+        }
+
+        void addIntoNewList(Vehicle vehicle) {
+                vehicleSchedule.put(vehicle.getBrand(), new LinkedList<>());
+                // não precisa ordenar, pois só tem um valor
+                vehicleSchedule.get(vehicle.getBrand()).add(vehicle);
         }
         /*
          * Remoção do cliente da lista
@@ -108,7 +131,7 @@ public class Schedule {
          *      De negócio 08
          */
         public Client find(String name) {
-                for (Client client : clientSchedule.get(name.charAt(0))) {
+                for (Client client : getClients(name.charAt(0))) {
                         if (client.getName().equals(name)) {
                                 return client;
                         }
