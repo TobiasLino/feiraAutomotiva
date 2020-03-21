@@ -26,7 +26,7 @@ public class Client {
         private Phone phone;
         private Address address;
         private Vehicle vehicle;
-        private Review nextReview;
+        private Revisions revisions;
 
         public Client() {
                 name = "";
@@ -35,7 +35,7 @@ public class Client {
                 address = new Address();
                 vehicle = new Vehicle();
                 vehicle.setClient(this);
-                nextReview = new Review(this);
+                revisions = new Revisions();
         }
         // Impressão dos dados
         public void print() {
@@ -45,6 +45,10 @@ public class Client {
                 address.print();
                 phone.print();
                 vehicle.print();
+        }
+        // Adiciona uma revisão do veículo do cliente
+        public void addReview(Review review) {
+                this.revisions.add(review);
         }
         /*
          * Getters e Setters
@@ -90,11 +94,11 @@ public class Client {
                 this.vehicle.setClient(this);
         }
 
-        public Review getNextReview() {
-                return nextReview;
+        public Revisions getRevisions() {
+                return revisions;
         }
 
-        public void setNextReview(Review nextReview) {
-                this.nextReview = nextReview;
+        public void setRevisions(Revisions revisions) {
+                this.revisions = revisions;
         }
 }

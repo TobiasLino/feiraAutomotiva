@@ -35,7 +35,9 @@ public class App {
                 // Verifica os arquivos de dados
                 ctrl.fileCheck();
                 // Passa os dados para as estruturas
-                ctrl.recover(schedule, revisions);
+                ctrl.recover(schedule);
+                // Insere os dados do arquivo das revisões em revisions
+                ctrl.recover(revisions);
                 // menu principal
                 while (true) {
                         switch (new Menu().mainMenu()) {

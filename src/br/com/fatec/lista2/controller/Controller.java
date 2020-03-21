@@ -418,7 +418,6 @@ public class Controller {
                 jsonObject.put("phone", client.getPhone().getNumber());
                 putClientAddressIntoJSON(jsonObject, client);
                 putClientVehicleIntoJSON(jsonObject, client);
-                putReviewDateIntoJSON(client.getNextReview(), jsonObject);
         }
         @SuppressWarnings("unchecked")
         private void putClientAddressIntoJSON(JSONObject jsonObject, Client client) {
@@ -449,21 +448,10 @@ public class Controller {
                 // Insere os dados no objeto
                 jsonObject.put("vehicle", jsonArrayVehicle);
         }
-        @SuppressWarnings("unchecked")
-        private void putReviewDateIntoJSON(Review review, JSONObject jsonObject) {
-                JSONObject reviewDate = new JSONObject();
-                JSONArray date = new JSONArray();
-                reviewDate.put("day", review.getReviewDate().get(Calendar.DAY_OF_MONTH));
-                reviewDate.put("month", review.getReviewDate().get(Calendar.MONTH));
-                reviewDate.put("year", review.getReviewDate().get(Calendar.YEAR));
-                date.add(reviewDate);
-                jsonObject.put("nextReview", date);
-        }
         /*
          * Insere os dados das próximas revisões no array
          */
-        private void sync(Revisions revisions) {
-                File revisionsFile = new File("usr//revisions//nextRevisions.json");
+        private void sync(File revisionsFile, Revisions revisions) {
                 try {
                         FileWriter revisionsJSON = new FileWriter(revisionsFile);
                         JSONArray revisionsArray = new JSONArray();
@@ -475,37 +463,12 @@ public class Controller {
                         Logger.getLogger(revisions.getClass().getName()).log(Level.SEVERE, null, ioE);
                 }
         }
-        // Insere os dados da revisão
-        @SuppressWarnings("unchecked")
-        private void insertReview(Revisions revisions, JSONArray jsonArray) {
-                for (Map.Entry<Client, List<Review>> revisionsMap : revisions.getMap().entrySet()) {
-                        for (Review rev : revisionsMap.getValue()) {
-                                JSONObject jsonObject = new JSONObject();
-                                putReviewIntoJSON(jsonObject, rev);
-                                jsonArray.add(jsonObject);
-                        }
-                }
-        }
-        // Insere os dados no objeto Json
-        private void putReviewIntoJSON(JSONObject jsonObject, Review review) {
-                putReviewDateIntoJSON(review, jsonObject);
-                putClientIntoReviewJSON(jsonObject, review.getClient());
-        }
-        // Insere o cliente que tem uma revisão agendada no json
-        @SuppressWarnings("unchecked")
-        private void putClientIntoReviewJSON(JSONObject jsonObject, Client client) {
-                JSONArray reviewClientArray = new JSONArray();
-                JSONObject reviewClient = new JSONObject();
-                putClientIntoJSON(client, reviewClient);
-                reviewClientArray.add(reviewClient);
-                jsonObject.put("client",reviewClientArray);
-        }
         /* ******************************
          * Recupera os dados do arquivo *
          * Compreendendo os requisitos: *
          *      Complementares 03 04    *
          * **************************** */
-        public void recover(Schedule schedule, Revisions revisions) {
+        public void recover(Schedule schedule) {
                 File clientsFile = new File("usr//clients//clients.json");
                 JSONParser jsonParser = new JSONParser();
                 try {
@@ -516,7 +479,8 @@ public class Controller {
 
         }
         // Recuperação dos dados dos clientes
-        private void recover(Schedule schedule, File clientsFile, JSONParser jsonParser) throws IOException, ParseException {
+        private void recover(Schedule schedule, File clientsFile, JSONParser jsonParser)
+                throws IOException, ParseException {
                 JSONArray jsonArray;
                 // Verifica se o arquivo está vazio
                 if (fileIsNotEmpty(clientsFile)) {
@@ -532,15 +496,18 @@ public class Controller {
         boolean fileIsNotEmpty(File file) {
                 return file.length() > 0;
         }
-        Object parseFromJSON(File file, JSONParser jsonParser) throws IOException, ParseException {
+        @SuppressWarnings("unchecked")
+        Object parseFromJSON(File file, JSONParser jsonParser)
+                throws IOException, ParseException {
                 FileReader arquivoJSON = new FileReader(file);
                 return  jsonParser.parse(arquivoJSON);
         }
         void insertIntoSchedule(Schedule schedule, Object object) {
                 JSONObject jsonObject = (JSONObject) object;
-                getJSON(jsonObject, schedule);
+                Client novo = getClientJSON(jsonObject);
+                schedule.add(novo);
         }
-        private void getJSON(JSONObject jsonObject, Schedule schedule) {
+        private Client getClientJSON(JSONObject jsonObject) {
                 Client tmp = new Client();
                 tmp.setName(jsonObject.get("name").toString());
                 tmp.setCpf(jsonObject.get("cpf").toString());
@@ -550,31 +517,84 @@ public class Controller {
                 getAddressFromJSON(jsonObject, tmp);
                 getVehicleFromJSON(jsonObject, tmp);
 
-                schedule.add(tmp);
+                return tmp;
         }
         private void getAddressFromJSON(JSONObject jsonObject, Client client) {
                 JSONArray jsonArray = (JSONArray) jsonObject.get("address");
                 for (Object o : jsonArray) {
                         JSONObject object = (JSONObject) o;
-                        client.getAddress().setStreet(object.get("street").toString());
-                        client.getAddress().setNumber(object.get("number").toString());
-                        client.getAddress().setComplement(object.get("complement").toString());
-                        client.getAddress().setNeighborhood(object.get("neighborhood").toString());
-                        client.getAddress().setCity(object.get("city").toString());
-                        client.getAddress().setState(object.get("state").toString());
+                        client.getAddress().setStreet(
+                                object.get("street").toString()
+                        );
+                        client.getAddress().setNumber(
+                                object.get("number").toString()
+                        );
+                        client.getAddress().setComplement(
+                                object.get("complement").toString()
+                        );
+                        client.getAddress().setNeighborhood(
+                                object.get("neighborhood").toString()
+                        );
+                        client.getAddress().setCity(
+                                object.get("city").toString()
+                        );
+                        client.getAddress().setState(
+                                object.get("state").toString()
+                        );
                 }
         }
         private void getVehicleFromJSON(JSONObject jsonObject, Client client) {
                 JSONArray jsonArray = (JSONArray) jsonObject.get("vehicle");
                 for (Object o : jsonArray) {
                         JSONObject object = (JSONObject) o;
-                        client.getVehicle().setLicensePlate(object.get("licensePlate").toString());
-                        client.getVehicle().setModelVersion(object.get("modelVersion").toString());
-                        client.getVehicle().setBrand(object.get("brand").toString());
+                        client.getVehicle().setLicensePlate(
+                                object.get("licensePlate").toString()
+                        );
+                        client.getVehicle().setModelVersion(
+                                object.get("modelVersion").toString()
+                        );
+                        client.getVehicle().setBrand(
+                                object.get("brand").toString()
+                        );
                         Calendar cal = Calendar.getInstance();
-                        cal.set(Calendar.YEAR, Integer.parseInt(object.get("yearOfManufacture").toString()));
+                        cal.set(Calendar.YEAR, Integer.parseInt(
+                                object.get("yearOfManufacture").toString())
+                        );
                         client.getVehicle().setYearOfManufacture(cal);
-                        client.getVehicle().setPurchasePrice(Double.parseDouble(object.get("purchasePrice").toString()));
+                        client.getVehicle().setPurchasePrice(
+                                Double.parseDouble(
+                                        object.get("purchasePrice").toString()
+                                )
+                        );
+                }
+        }
+        /* ***************************************************************** *
+         * Recupera os dados da revisions                                    *
+         * ***************************************************************** */
+        public void recover(Revisions revisions) {
+
+        }
+        // Devolve como revisions baseando-se no nome do cliente
+        void getRevisionsFromJSON(Client client, Revisions revisions) {
+                File prevRev = new File("usr//revisions/"
+                        + "/previousRevisions.json");
+                JSONParser parser = new JSONParser();
+                try {
+                        if (fileIsNotEmpty(prevRev)) {
+                                Object object = parseFromJSON(prevRev, parser);
+                                if (object instanceof JSONArray) {
+                                        for
+                                }
+                        }
+                } catch (ParseException | IOException e) {
+                        e.printStackTrace();
+                }
+        }
+        // devolve o objetojson no json array
+        void InsertIntoRevisions(JSONObject object) {
+                Client tempC = getClientJSON(object);
+                if (isNotNull(tempC)) {
+
                 }
         }
 }
